@@ -15,9 +15,16 @@ const hashed = password => {
 }
 
 aedes.authenticate = async function (client, username, password, callback) {
-    const reqUserName = username
-    const reqPass = password.toString()
+
     try {
+            const reqUserName = username
+            if(password){
+                const reqPass = password.toString()
+            }else{
+                var error = new Error('Auth error')
+                error.returnCode = 4
+                callback(error, null)
+            }
         //DBからユーザーを取得する
         const user = await db.User.findOne({ where: { username: reqUserName } });
         if (user.username === reqUserName && user.password === hashed(reqPass)) {
