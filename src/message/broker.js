@@ -2,9 +2,14 @@
 const aedes = require('aedes')()
 const server = require('net').createServer(aedes.handle)
 const db = require('../../models/index');
+var redis = require('./redis');
+
+
 var crypto = require("crypto");
 //MQTTブローカーのポート
 const port = 1883
+
+var grobal_username = ""
 
 // sha-512で暗号化
 const hashed = password => {
@@ -16,19 +21,21 @@ const hashed = password => {
 
 aedes.authenticate = async function (client, username, password, callback) {
     try {
-            const reqUserName = username
-            var reqPass = ""
-            if(password){
-                reqPass = password.toString()
-            }else{
-                var error = new Error('Auth error')
-                error.returnCode = 4
-                callback(error, null)
-            }
+        const reqUserName = username
+        var reqPass = ""
+        if (password) {
+            reqPass = password.toString()
+        } else {
+            var error = new Error('Auth error')
+            error.returnCode = 4
+            callback(error, null)
+        }
         //DBからユーザーを取得する
         const user = await db.User.findOne({ where: { username: reqUserName } });
         if (user.username === reqUserName && user.password === hashed(reqPass)) {
+            grobal_username = username
             callback(null, username === reqUserName)
+
         }
         else {
             var error = new Error('Auth error')
@@ -51,9 +58,12 @@ aedes.on('connectionError', function (client, err) {
 })
 
 // publishされた場合
-aedes.on('publish', function (packet, client) {
+aedes.on('publish', async function (packet, client) {
     if (client) {
         console.log('message from client', client.id)
+        console.log(packet.payload.toString())
+        redis.user_insert(grobal_username,packet.payload.toString())
+      
     }
 })
 
@@ -71,5 +81,6 @@ aedes.on('client', function (client) {
 
 // MQTTブローカー起動
 server.listen(port, function () {
+
     console.log('server listening on port', port)
 })
