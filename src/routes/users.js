@@ -3,8 +3,6 @@ var express = require('express');
 var router = express.Router();
 router.use(express.json());
 var jwt = require('jsonwebtoken')
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
 const session = require('express-session')
 var crypto = require("crypto");
 const db = require('../../models/index');
