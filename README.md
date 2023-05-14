@@ -1,1 +1,1 @@
-# firealarm_api
+## Getting started
