@@ -15,11 +15,11 @@ const hashed = password => {
 }
 
 aedes.authenticate = async function (client, username, password, callback) {
-
     try {
             const reqUserName = username
+            var reqPass = ""
             if(password){
-                const reqPass = password.toString()
+                reqPass = password.toString()
             }else{
                 var error = new Error('Auth error')
                 error.returnCode = 4
@@ -36,20 +36,9 @@ aedes.authenticate = async function (client, username, password, callback) {
             callback(error, null)
         }
     } catch (error) {
-        console.log("ERROR")
+        console.log(error)
     }
 }
-
-
-// if(username === "admin" & password.toString() ===  "pass" ){
-//      callback(null,username==="admin")
-// }else{
-//     var error = new Error('Auth error')
-//     error.returnCode = 4
-//     callback(error, null)
-// }
-//   }
-
 
 // クライアントエラーの場合
 aedes.on('clientError', function (client, err) {
