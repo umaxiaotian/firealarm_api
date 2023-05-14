@@ -9,10 +9,12 @@
     "seed": "npx sequelize-cli db:seed:all"
   },
   "dependencies": {
+    "aedes": "^0.49.0",
     "crypto": "^1.0.1",
     "express": "4.18.2",
     "express-session": "^1.17.3",
     "jsonwebtoken": "^9.0.0",
+    "net": "^1.0.2",
     "nodemon": "^2.0.22",
     "sequelize": "^6.31.1",
     "sqlite3": "^5.1.6"

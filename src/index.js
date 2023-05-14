@@ -2,6 +2,7 @@ var express = require('express');
 const app = express();
 app.use(express.json());
 var user = require('./routes/users');
+var broker = require('./message/broker');
 const session = require('express-session')
 
 // セッションの生存時間（分で指定）
