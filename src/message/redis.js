@@ -10,13 +10,13 @@ client.on('error', function (err) {
 });
 
 client.user_insert = async function (username,topic, value) {
-
+    await client.select(3)
 
     const key_list = await client.keys(username +'?'+topic + '@*')
     var max = 0
     var key_num_array = []
     key_list.forEach(element => {
-  console.log(element)
+//   console.log(element)
         key_num_array.push(
             
             Number(element.replace(username +'?'+topic + '@', ''))
@@ -24,19 +24,17 @@ client.user_insert = async function (username,topic, value) {
             );
     });
 
-    console.log(key_num_array)
+   
 
-    if(key_num_array == -Infinity){
-max = 0
-        
+    if(key_num_array[0] === -Infinity || key_num_array[0] === undefined ){
+        max = 0;
     }else{
         max = Math.max.apply(null, key_num_array);
+        max++;
     }
-  
 
     // console.log(max)
-
-    max++;
+  
 
     await client.set(username +'?'+topic + '@' + max, value)
     //    client.quit()
