@@ -10,7 +10,7 @@ var crypto = require("crypto");
 const port = 1883
 
 var grobal_username = ""
-
+var global_topic = ""
 // sha-512で暗号化
 const hashed = password => {
     let hash = crypto.createHmac('sha512', password)
@@ -62,7 +62,7 @@ aedes.on('publish', async function (packet, client) {
     if (client) {
         console.log('message from client', client.id)
         console.log(packet.payload.toString())
-        redis.user_insert(grobal_username,packet.payload.toString())
+        redis.user_insert(grobal_username,global_topic,packet.payload.toString())
       
     }
 })
@@ -70,15 +70,30 @@ aedes.on('publish', async function (packet, client) {
 // 新しいsubscriberが接続した場合
 aedes.on('subscribe', function (subscriptions, client) {
     if (client) {
-        console.log('subscribe from client', subscriptions, client.id)
+        // console.log('subscribe from client', subscriptions, client.id)
+        global_topic= subscriptions[0].topic;
     }
 })
 
-// 新しいクライアントが接続した場合
-aedes.on('client', function (client) {
-    console.log('new client', client.id)
+aedes.on('unsubscribe ', function (subscriptions, client) {
+    if (client) {
+        global_topic= subscriptions[0].topic;
+    }
 })
 
+
+// 新しいクライアントが接続した場合
+aedes.on('client', async function (client) {
+
+    await redis.connect();
+    console.log('new client', client.id)
+
+})
+// クライアントが切断した場合
+aedes.on('clientDisconnect', function (client) {
+    redis.quit()
+    console.log('DISCONNECT')
+})
 // MQTTブローカー起動
 server.listen(port, function () {
 
