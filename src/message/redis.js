@@ -9,37 +9,23 @@ client.on('error', function (err) {
     console.log('次のエラーが発生しました：' + err);
 });
 
-client.user_insert = async function (username,topic, value) {
-    await client.select(3)
-
-    const key_list = await client.keys(username +'?'+topic + '@*')
+client.user_insert = async function (username, topic, value) {
+    await client.select(4)
+    const key_list = await client.keys(username + '?' + topic + '@*')
     var max = 0
     var key_num_array = []
     key_list.forEach(element => {
-//   console.log(element)
-        key_num_array.push(
-            
-            Number(element.replace(username +'?'+topic + '@', ''))
-            
+        if (element.replace(username + '?' + topic + '@', '') === '') {
+            max = 0
+        } else {
+            key_num_array.push(
+                Number(element.replace(username + '?' + topic + '@', ''))
             );
+            max = Math.max.apply(null, key_num_array);
+            max++;
+        }
     });
-
-   
-
-    if(key_num_array[0] === -Infinity || key_num_array[0] === undefined ){
-        max = 0;
-    }else{
-        max = Math.max.apply(null, key_num_array);
-        max++;
-    }
-
-    // console.log(max)
-  
-
-    await client.set(username +'?'+topic + '@' + max, value)
-    //    client.quit()
-
+    await client.set(username + '?' + topic + '@' + max, value)
 }
-
 
 module.exports = client;
